@@ -1,47 +1,10 @@
-﻿using System.Diagnostics;
-
-public class Program
+﻿namespace ProcessWatcher
 {
-  public static List<PerformanceCounter> GetGPUCounters()
+  public class Program
   {
-    var category = new PerformanceCounterCategory("GPU Engine");
-    var counterNames = category.GetInstanceNames();
-
-    var gpuCounters = counterNames
-                        .Where(counterName => counterName.EndsWith("engtype_3D"))
-                        .SelectMany(counterName => category.GetCounters(counterName))
-                        .Where(counter => counter.CounterName.Equals("Utilization Percentage"))
-                        .ToList();
-
-    return gpuCounters;
-  }
-
-  public static float GetGPUUsage(List<PerformanceCounter> gpuCounters)
-  {
-    gpuCounters.ForEach(x => x.NextValue());
-
-    var result = gpuCounters.Sum(x => x.NextValue());
-
-    return result;
-  }
-
-  public static void Main(string[] args)
-  {
-    while (true)
+    public static void Main(string[] args)
     {
-      try
-      {
-        var gpuCounters = GetGPUCounters();
-        var gpuUsage = GetGPUUsage(gpuCounters);
-
-        Console.WriteLine(gpuUsage);
-      }
-      catch (Exception e)
-      {
-        Console.Error.Write(e);
-      }
-
-      Thread.Sleep(1000);
+      var watcher = new Metrics.Watcher();
     }
   }
 }
